@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<broker>
+	<!-- SELECT statements -->
+	<statement id="countCompany">
+		<content>
+		SELECT count(id)
+		FROM company
+		WHERE id = :id
+		</content>
+	</statement>
+
+	<statement id="selectCompany" result="company">
+		<content>
+		SELECT c.*
+		FROM company c
+		</content>
+		<condition id="ById">
+		WHERE c.id = :id
+		</condition>
+	</statement>
+
+	<statement id="selectAllCompanies" result="company">
+		<content from="selectCompany"/>
+	</statement>
+
+	<statement id="selectEmployee" result="employee">
+		<content>
+		SELECT
+			e.*,
+			c.* as company_name,
+			u.name as bu
+		FROM employee e
+		LEFT JOIN company c on c.id = e.company_id
+		LEFT JOIN unit u on u.employee_id = e.id
+		</content>
+		<condition id="ByCompanyId">
+		WHERE e.company_id = :id
+		</condition>
+		<condition id="ById">
+		WHERE e.id = :id
+		</condition>
+		<append>
+		ORDER BY e.id DESC
+		</append>
+	</statement>
+
+	<statement id="countEmployee" result="company">
+		<content>
+		SELECT count(*)
+		FROM employee e
+		LEFT JOIN company c on c.id = e.company_id
+		</content>
+		<conditions from="selectEmployee"/>
+	</statement>
+
+	<statement id="countCompanies">
+		<content> SELECT count(id) FROM company </content>
+	</statement>
+
+	<!-- INSERT / UPDATE / DELETE statements -->
+
+	<statement id="insertCompany">
+		<content>
+		INSERT INTO company(
+			#foreach($f in $fields)
+				`$f` #if( $velocityHasNext ),#end
+			#end
+		) VALUES (
+			#foreach($f in $fields)
+				:$f #if( $velocityHasNext ),#end
+			#end
+		)
+		</content>
+	</statement>
+
+	<statement id="deleteCompany">
+		<content>DELETE FROM company WHERE id = :id</content>
+	</statement>
+
+	<!-- Object Mappings -->
+	<binding id="company" class="custom.datamodel.Company">
+		<property name="id">
+			<column name="id" as="java.lang.Long"/>
+		</property>
+		<property name="name">
+			<column name="company_name"/>
+		</property>
+		<method name="setAddress">
+			<column name="address" />
+		</method>
+	</binding>
+
+	<binding id="manager" class="custom.datamodel.Manager">
+		<property name="businessUnit">
+			<column name="bu"/>
+		</property>
+	</binding>
+
+	<binding id="employee" class="custom.datamodel.Employee">
+		<property name="name"/>
+		<property name="email">
+			<column name="email"/>
+		</property>
+		<property name="type" factory="custom.datamodel.EmployeeType" method="valueOf">
+			<column name="type"/>
+		</property>
+		<property name="company">
+			<delegate to="company"/>
+		</property>
+		<property name="active">
+			<column name="active" as="java.lang.Boolean"/>
+		</property>
+		<property name="birthDate">
+			<column name="birth"/>
+		</property>
+		<method name="setSalary">
+			<column name="salary" />
+			<column name="currency"/>
+		</method>
+		<extend with="manager" ifequals="0">
+			<column name="type" />
+		</extend>
+	</binding>
+
+</broker>
