@@ -46,10 +46,10 @@ http://www.springframework.org/schema/util http://www.springframework.org/schema
 
 	<!-- Test datamodel -->
 		
-	<bean id="contactlab" class="custom.datamodel.Company">
+	<bean id="samplelab" class="custom.datamodel.Company">
 		<property name="id" value="1"/>
-		<property name="name" value="Contactlab"/>
-		<property name="address" value="via Natale Battaglia, 12 - Milano"/>
+		<property name="name" value="SampleLab"/>
+		<property name="address" value="via burti, 12 - Milano"/>
 	</bean>
 
 	<bean id="zikzak" class="custom.datamodel.Company">
@@ -60,7 +60,7 @@ http://www.springframework.org/schema/util http://www.springframework.org/schema
 
 	<bean name="employee" class="custom.datamodel.Employee">
       <property name="name" value="John Doe"/>
-      <property name="email" value="jdoe@contactlab.com"/>
+      <property name="email" value="jdoe@samplelab.com"/>
       <property name="active" value="1"/>
       <property name="salary" value="15000 €"/>
       <property name="type" value="STANDARD"/>
@@ -70,11 +70,11 @@ http://www.springframework.org/schema/util http://www.springframework.org/schema
 
      <bean name="manager" class="custom.datamodel.Manager">
       <property name="name" value="Super Manager"/>
-      <property name="email" value="aaa.bbb@contactlab.com"/>
+      <property name="email" value="aaa.bbb@samplelab.com"/>
       <property name="active" value="0"/>
       <property name="salary" value="20000 €"/>
       <property name="type" value="MANAGER"/>
-      <property name="company" ref="contactlab"/>
+      <property name="company" ref="samplelab"/>
       <property name="businessUnit" value="Research and Development"/>
       <property name="birthDate" value="1979-04-27"/>
     </bean>
@@ -103,6 +103,6 @@ http://www.springframework.org/schema/util http://www.springframework.org/schema
 		<property name="driverClassName" value="com.mysql.jdbc.Driver"/>
 		<property name="url" value="jdbc:mysql://localhost:3306/orbroker"/>
 		<property name="username" value="root"/>
-		<property name="password" value="d34rb34r"/>
+		<property name="password" value="sample"/>
 	</bean>
 </beans>

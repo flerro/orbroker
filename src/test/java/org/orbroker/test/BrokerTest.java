@@ -51,8 +51,8 @@ public class BrokerTest {
 	Company zikzak;
 
 	@Autowired
-	@Qualifier("contactlab")
-	Company contactlab;
+	@Qualifier("samplelab")
+	Company samplelab;
 
 	@Autowired
 	@Qualifier("employee")
@@ -114,9 +114,9 @@ public class BrokerTest {
 
 		SqlParameterSource params1 = new MapSqlParameterSource("id", 1);
 		Company company = broker.<Company>fetchOne("selectCompanyById", params1, dataSource);
-		assertEquals(contactlab.getId(), company.getId());
-		assertEquals(contactlab.getName(), company.getName());
-		assertEquals(contactlab.getAddress(), company.getAddress());
+		assertEquals(samplelab.getId(), company.getId());
+		assertEquals(samplelab.getName(), company.getName());
+		assertEquals(samplelab.getAddress(), company.getAddress());
 
 		SqlParameterSource params2 = new MapSqlParameterSource("id", 2);
 		company = broker.<Company>fetchOne("selectCompanyById", params2, dataSource);

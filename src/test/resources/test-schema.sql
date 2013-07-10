@@ -31,6 +31,6 @@ CREATE TABLE  `unit` (
   PRIMARY KEY (`id`)
 );
 
-INSERT INTO `company` VALUES (1,'Contactlab','via Natale Battaglia, 12 - Milano'), (2,'Zikzak','via dei pazzi, 10 - Milano');
-INSERT INTO `employee` VALUES (1,'John Doe','jdoe@contactlab.com', FROM_UNIXTIME(294080400), 1,15000,'€',1,2), (2,'Super Manager','aaa.bbb@contactlab.com', FROM_UNIXTIME(294080400),0,20000,'€',0,1);
+INSERT INTO `company` VALUES (1,'SampleLab','via burti, 12 - Milano'), (2,'Zikzak','via dei pazzi, 10 - Milano');
+INSERT INTO `employee` VALUES (1,'John Doe','jdoe@samplelab.com', FROM_UNIXTIME(294080400), 1,15000,'€',1,2), (2,'Super Manager','aaa.bbb@samplelab.com', FROM_UNIXTIME(294080400),0,20000,'€',0,1);
 INSERT INTO `unit` VALUES (1,'Research and Development',2);
