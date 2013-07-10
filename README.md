@@ -39,31 +39,33 @@ and bind results with properties or method of your data-model
 
 Add multiple ``WHERE`` in one SQL statements 
 
-		<statement id="selectEmployee" result="employee">
-			<content>
-			SELECT
-				e.*,
-				c.* as company_name,
-				u.name as bu
-			FROM employee e
-			LEFT JOIN company c on c.id = e.company_id
-			LEFT JOIN unit u on u.employee_id = e.id
-			</content>
-			<condition id="ByCompanyId">
-			WHERE e.company_id = :id
-			</condition>
-			<condition id="ById">
-			WHERE e.id = :id
-			</condition>
-			<append>
-			ORDER BY e.id DESC
-			</append>
-		</statement>
+```XML
+<statement id="selectEmployee" result="employee">
+	<content>
+	SELECT
+		e.*,
+		c.* as company_name,
+		u.name as bu
+	FROM employee e
+	LEFT JOIN company c on c.id = e.company_id
+	LEFT JOIN unit u on u.employee_id = e.id
+	</content>
+	<condition id="ByCompanyId">
+	WHERE e.company_id = :id
+	</condition>
+	<condition id="ById">
+	WHERE e.id = :id
+	</condition>
+	<append>
+	ORDER BY e.id DESC
+	</append>
+</statement>
+```
 
 And use them accordingly
 
 ```Java
-	Employee employee = broker.<Employee>fetchOne("selectEmployeeById", params, dataSource);
+Employee employee = broker.<Employee>fetchOne("selectEmployeeById", params, dataSource);
 ```
 
 Share ``WHERE`` conditions between statements
@@ -121,7 +123,7 @@ Bind multi parameter methods, call factory methods, work with inheritance
 </binding>
 ```
 
-You can write your own adapter to do type convertion from DB column type.
+Write your own adapter for seamless type convertion from DB column type to your model:
 
 ```Java
 package org.orbroker.binding.adapter.impl;
@@ -148,8 +150,6 @@ public class TimestampToDateAdapter implements BindingAdapter<Timestamp, Date> {
 	}
 }
 ```
-
-Adapters work seamlessy
 
 ```XML
 <binding id="employee" class="custom.datamodel.Employee">
