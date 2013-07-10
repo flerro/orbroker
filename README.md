@@ -24,14 +24,21 @@ and bind results with properties or method of your data-model
 ```XML
 <binding id="company" class="custom.datamodel.Company">
 	<property name="id">
+		<!-- Explicit type convertion --> 
 		<column name="id" as="java.lang.Long"/>
 	</property>
+	<!-- set property -->
 	<property name="name">
 		<column name="company_name"/>
 	</property>
+	<!-- bind column by property name -->
+	<property name="address"/>
+	<!-- 
+	Alternative method syntax ia available
 	<method name="setAddress">
 		<column name="address" />
 	</method>
+	-->
 </binding>
 ```
 
@@ -50,6 +57,7 @@ Add multiple ``WHERE`` in one SQL statements
 	LEFT JOIN company c on c.id = e.company_id
 	LEFT JOIN unit u on u.employee_id = e.id
 	</content>
+	<!-- multiple WHEREs -->
 	<condition id="ByCompanyId">
 	WHERE e.company_id = :id
 	</condition>
@@ -61,10 +69,10 @@ Add multiple ``WHERE`` in one SQL statements
 	</append>
 </statement>
 ```
-
 And use them accordingly
 
 ```Java
+// Call the 'selectEmployee' statement using the 'ById' condition
 Employee employee = broker.<Employee>fetchOne("selectEmployeeById", params, dataSource);
 ```
 
@@ -77,6 +85,8 @@ Share ``WHERE`` conditions between statements
 	FROM employee e
 	LEFT JOIN company c on c.id = e.company_id
 	</content>
+	<!-- inherits where conditions from the above
+			selectEmployee statements -->
 	<conditions from="selectEmployee"/>
 </statement>
 ```
@@ -109,21 +119,26 @@ Bind multi parameter methods, call factory methods, work with inheritance
 	<property name="email">
 		<column name="email"/>
 	</property>
+	<!-- Call the given factory method 
+		to value type property (it is an Enum type)-->
 	<property name="type" factory="custom.datamodel.EmployeeType" method="valueOf">
 		<column name="type"/>
 	</property>
 	...
+	<!-- call a method using two TABLE columns as parameters -->
 	<method name="setSalary">
 		<column name="salary" />
 		<column name="currency"/>
 	</method>
+	<!-- Return an instance of Manager (THAT extends Employee) 
+			if column named type has value 0 -->
 	<extend with="manager" ifequals="0">
 		<column name="type" />
 	</extend>
 </binding>
 ```
 
-Write your own adapter for seamless type convertion from DB column type to your model:
+Write your own adapter for seamless type convertion from DB column type to your model
 
 ```Java
 package org.orbroker.binding.adapter.impl;
@@ -151,11 +166,15 @@ public class TimestampToDateAdapter implements BindingAdapter<Timestamp, Date> {
 }
 ```
 
+And use them
+
 ```XML
 <binding id="employee" class="custom.datamodel.Employee">
 	...
+	<!-- JDBC type for the 'birth' colunm is java.sql.Timestamp, 
+			Employee.birtDate property type is java.util.Date-->
 	<property name="birthDate">
-		<column name="birth"/>
+		<column name="birth"/> 
 	</property>
 	...
 </binding>
