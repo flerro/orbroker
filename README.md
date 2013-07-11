@@ -3,7 +3,7 @@ OR-Broker is yet another library that would like to help solving the object-rela
 
 The reason for it?
 
-> I had the need to tackle a big and legacy (un-touchable) DB schema but I didn't want to mirror it in the application data-model. I wanted total freedom in my data-model: binding factory or multi params mehtods, handling inheritance. Moreover I wanted total control over the executed SQL statemts, working in parallel on multiple datasources, and I did want to keep my SQL DRY. 
+> I had the need to tackle a big and legacy (un-touchable) DB schema but I didn't want to mirror it in the application data-model. I wanted total freedom in my data-model: binding factory or multi params mehtods, handling inheritance. Moreover I wanted total control over the executed SQL statemets (on multiple datasources), and I did want to keep my SQL DRY. 
 
 ## Know it
 
@@ -120,7 +120,7 @@ Bind multi parameter methods, call factory methods, work with inheritance
 		<column name="email"/>
 	</property>
 	<!-- Call the given factory method 
-		to value type property (it is an Enum type)-->
+		to value the 'type' property (it is an Enum type)-->
 	<property name="type" factory="custom.datamodel.EmployeeType" method="valueOf">
 		<column name="type"/>
 	</property>
@@ -130,7 +130,7 @@ Bind multi parameter methods, call factory methods, work with inheritance
 		<column name="salary" />
 		<column name="currency"/>
 	</method>
-	<!-- Return an instance of Manager (THAT extends Employee) 
+	<!-- Return an instance of Manager (Manager extends Employee) 
 			if column named type has value 0 -->
 	<extend with="manager" ifequals="0">
 		<column name="type" />
