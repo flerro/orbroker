@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:oxm="http://www.springframework.org/schema/oxm"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:util="http://www.springframework.org/schema/util"
+
+	xsi:schemaLocation="
+http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+http://www.springframework.org/schema/oxm http://www.springframework.org/schema/oxm/spring-oxm.xsd
+http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
+http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+
+	<bean id="log4jInitialization"
+		class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+		<property name="targetClass" value="org.springframework.util.Log4jConfigurer" />
+		<property name="targetMethod" value="initLogging" />
+		<property name="arguments">
+			<list>
+				<value>classpath:org/orbroker/test/log4j-test.xml</value>
+			</list>
+		</property>
+	</bean>
+	
+	<bean id="cfgSourcePath" class="org.springframework.core.io.ClassPathResource">
+		<constructor-arg value="orm" />
+	</bean>
+			
+	<bean id="broker" class="org.orbroker.Broker">
+		<constructor-arg>
+			<bean factory-bean="cfgSourcePath" factory-method="getFile"/>				
+		</constructor-arg>
+		<constructor-arg>
+			<bean class="org.orbroker.binding.adapter.BindingAdapters">
+				<constructor-arg>
+					<util:list>
+						<bean class="org.orbroker.binding.adapter.impl.IntToLongAdapter"/>
+					</util:list>
+				</constructor-arg>
+			</bean>
+		</constructor-arg>		
+	</bean>
+
+	<!-- Test datamodel -->
+		
+	<bean id="samplelab" class="custom.datamodel.Company">
+		<property name="id" value="1"/>
+		<property name="name" value="SampleLab"/>
+		<property name="address" value="via burti, 12 - Milano"/>
+	</bean>
+
+	<bean id="zikzak" class="custom.datamodel.Company">
+		<property name="id" value="2"/>
+		<property name="name" value="Zikzak"/>
+		<property name="address" value="via dei pazzi, 10 - Milano"/>
+	</bean>
+
+	<bean name="employee" class="custom.datamodel.Employee">
+      <property name="name" value="John Doe"/>
+      <property name="email" value="jdoe@samplelab.com"/>
+      <property name="active" value="1"/>
+      <property name="salary" value="15000 €"/>
+      <property name="type" value="STANDARD"/>
+      <property name="company" ref="zikzak"/>
+      <property name="birthDate" value="1979-04-27"/>
+    </bean>
+
+     <bean name="manager" class="custom.datamodel.Manager">
+      <property name="name" value="Super Manager"/>
+      <property name="email" value="aaa.bbb@samplelab.com"/>
+      <property name="active" value="0"/>
+      <property name="salary" value="20000 €"/>
+      <property name="type" value="MANAGER"/>
+      <property name="company" ref="samplelab"/>
+      <property name="businessUnit" value="Research and Development"/>
+      <property name="birthDate" value="1979-04-27"/>
+    </bean>
+
+	<bean id="dateEditor" class="org.springframework.beans.propertyeditors.CustomDateEditor">
+		<constructor-arg>
+			<bean class="java.text.SimpleDateFormat">
+				<constructor-arg value="yyyy-MM-dd" />
+			</bean>
+		</constructor-arg>
+		<constructor-arg value="true" />
+	</bean>
+  
+    <bean class="org.springframework.beans.factory.config.CustomEditorConfigurer">
+		<property name="customEditors">
+			<map>
+				<entry key="java.util.Date">
+					<ref local="dateEditor" />
+				</entry>
+			</map>
+		</property>
+	</bean>
+	
+
+	<bean id="localhost" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+		<property name="driverClassName" value="com.mysql.jdbc.Driver"/>
+		<property name="url" value="jdbc:mysql://localhost:3306/orbroker"/>
+		<property name="username" value="root"/>
+		<property name="password" value="sample"/>
+	</bean>
+</beans>
