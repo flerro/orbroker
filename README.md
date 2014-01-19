@@ -1,30 +1,31 @@
-
-OR-Broker is yet another library that would like to help solving the object-relational mapping problem. 
+OR-Broker is yet another library trying to solve the mapping problem between Java objects and tables in a relational database.
 
 The reason for it?
 
-> I had the need to tackle a big and legacy (un-touchable) DB schema but I didn't want to mirror it in the application data-model. I wanted total freedom in my data-model: binding factory or multi params mehtods, handling inheritance. Moreover I wanted total control over the executed SQL statemets (on multiple datasources), and I did want to keep my SQL DRY. 
+> I had the need to tackle a big and legacy (un-touchable) DB schema but I didn't want to mirror it in the application data-model. I wanted total freedom in my data-model: binding factory or multi params mehtods, handling inheritance. Moreover I wanted total control over the executed SQL statemets (on multiple datasources), and I did want to keep my SQL DRY.
 
 ## Know it
 
 Build your own query in plain old SQL (wrapped in an XML envelope)
 
 ```XML
-<statement id="countCompany">
-	<content>
-	SELECT count(id)
-	FROM company
-	WHERE id = :id
-	</content>
+<statement id="selectCompany" result="company">
+    <content>
+    SELECT c.*
+    FROM company c
+    </content>
+    <condition id="ById">
+    WHERE c.id = :id
+    </condition>
 </statement>
 ```
 
-and bind results with properties or method of your data-model
+Configure the data binding using properties or methods of your data-model
 
 ```XML
 <binding id="company" class="custom.datamodel.Company">
 	<property name="id">
-		<!-- Explicit type convertion --> 
+		<!-- Explicit type convertion -->
 		<column name="id" as="java.lang.Long"/>
 	</property>
 	<!-- set property -->
@@ -33,7 +34,7 @@ and bind results with properties or method of your data-model
 	</property>
 	<!-- bind column by property name -->
 	<property name="address"/>
-	<!-- 
+	<!--
 	Alternative method syntax ia available
 	<method name="setAddress">
 		<column name="address" />
@@ -42,9 +43,21 @@ and bind results with properties or method of your data-model
 </binding>
 ```
 
-### Keep your SQL DRY: 
+Perform queries using the library API
 
-Add multiple ``WHERE`` in one SQL statements 
+```Java
+Map params = new HashMap();
+params.put("id", 1);
+Company company =
+        broker.fetchOne("selectCompanyById", params, dataSource);
+```
+
+The mapping will be performed by the OR-broker using _reflection_.
+
+
+### Keep your SQL DRY
+
+Add multiple ``WHERE`` in one SQL statements
 
 ```XML
 <statement id="selectEmployee" result="employee">
@@ -69,11 +82,13 @@ Add multiple ``WHERE`` in one SQL statements
 	</append>
 </statement>
 ```
-And use them accordingly
+
+and use them accordingly
 
 ```Java
 // Call the 'selectEmployee' statement using the 'ById' condition
-Employee employee = broker.<Employee>fetchOne("selectEmployeeById", params, dataSource);
+Employee employee =
+    broker.<Employee>fetchOne("selectEmployeeById", params, dataSource);
 ```
 
 Share ``WHERE`` conditions between statements
@@ -85,11 +100,13 @@ Share ``WHERE`` conditions between statements
 	FROM employee e
 	LEFT JOIN company c on c.id = e.company_id
 	</content>
-	<!-- inherits where conditions from the above
+	<!-- inherits where conditions from the
 			selectEmployee statements -->
 	<conditions from="selectEmployee"/>
 </statement>
 ```
+
+to avoid duplications in SQL.
 
 Use Velocity templating in your statements
 
@@ -109,9 +126,11 @@ Use Velocity templating in your statements
 </statement>
 ```
 
-### Freedom for objects 
+to build repetitive SQL queries.
 
-Bind multi parameter methods, call factory methods, work with inheritance
+### Freedom for objects
+
+Bind DB tables and your data-model using multi-parameter methods, call factory methods, deal with inheritance
 
 ```XML
 <binding id="employee" class="custom.datamodel.Employee">
@@ -119,7 +138,7 @@ Bind multi parameter methods, call factory methods, work with inheritance
 	<property name="email">
 		<column name="email"/>
 	</property>
-	<!-- Call the given factory method 
+	<!-- Call the given factory method
 		to value the 'type' property (it is an Enum type)-->
 	<property name="type" factory="custom.datamodel.EmployeeType" method="valueOf">
 		<column name="type"/>
@@ -130,7 +149,7 @@ Bind multi parameter methods, call factory methods, work with inheritance
 		<column name="salary" />
 		<column name="currency"/>
 	</method>
-	<!-- Return an instance of Manager (Manager extends Employee) 
+	<!-- Return an instance of Manager (Manager extends Employee)
 			if column named type has value 0 -->
 	<extend with="manager" ifequals="0">
 		<column name="type" />
@@ -138,7 +157,7 @@ Bind multi parameter methods, call factory methods, work with inheritance
 </binding>
 ```
 
-Write your own adapter for seamless type convertion from DB column type to your model
+Write your own adapter for seamless type conversion between DB columns types and your classes
 
 ```Java
 package org.orbroker.binding.adapter.impl;
@@ -166,26 +185,49 @@ public class TimestampToDateAdapter implements BindingAdapter<Timestamp, Date> {
 }
 ```
 
-And use them
+they will loaded and _auto-magically_ applied when a data-type conversion is needed.
 
 ```XML
 <binding id="employee" class="custom.datamodel.Employee">
 	...
-	<!-- JDBC type for the 'birth' colunm is java.sql.Timestamp, 
+	<!-- JDBC type for the 'birth' colunm is java.sql.Timestamp,
 			Employee.birtDate property type is java.util.Date-->
 	<property name="birthDate">
-		<column name="birth"/> 
+		<column name="birth"/>
 	</property>
 	...
 </binding>
 ```
- 
+
+as in the example above.
+
+
 # Use it
-It's a [Maven](http://maven.apache.org/) project. 
+It's a [Maven](http://maven.apache.org/) project.
+Just download it to your machine and install into your maven repository
+
+```bash
+ $ wget -O orbroker.zip https://github.com/flerro/orbroker/archive/master.zip
+ $ unzip orbroker.zip
+ $ cd orbroker-master
+ orbroker-master/ $ mvn install
+```
+
+and add a reference to OR-broker as a dependency
+
+```XML
+   <dependency>
+      <groupId>org.orbroker</groupId>
+      <artifactId>orbroker</artifactId>
+      <version>1.0</version>
+   </dependency>
+```
+
+in your project ```pom.xml```.
 
 ## Behind the scenes
 
-OR-Broker leverages: 
+OR-Broker leverages:
  - Spring reflection utils for binding
  - velocity for optional SQL templating
  - standard Java XML SAX parser
@@ -196,10 +238,8 @@ If you are not familiar with maven please take a look to: [Maven in five minutes
 Is it production ready? It is quite solid, please take a look at it and decide by yourself. It has been built (and used) to power a big API project handling lots of traffic.
 
 ## Known issues/drawbacks
-- too much freedom means no convention over configuration (lots of XML boilerplate)
-- documentation is missing (please take a look at the testcases under the test source folder)
+- too much freedom means lots of XML boilerplate
+- documentation is missing (please take a look at the tests for examples)
 - XML is quite verbose (a DSL would be way better)
 
-# Thanks
-Feel free to fork OR-Broker, I'm looking forward to your pull requests and to your feedback.
-
+More info [here](http://www.rolandfg.net/2013/07/08/or-broker/)

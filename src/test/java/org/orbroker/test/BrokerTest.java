@@ -88,7 +88,7 @@ public class BrokerTest {
 		assertEquals(13, statements.size());
 
 		Map<String,String> declaredStatements = new HashMap<String,String>();
-		declaredStatements.put("countCompany","SELECT count(id) FROM company WHERE id = :id");
+		declaredStatements.put("countCompany","SELECT count(id) FROM company");
 		declaredStatements.put("selectCompany","SELECT c.* FROM company c");
 		declaredStatements.put("selectCompanyById","SELECT c.* FROM company c  WHERE c.id = :id");
 		declaredStatements.put("selectAllCompanies","SELECT c.* FROM company c");

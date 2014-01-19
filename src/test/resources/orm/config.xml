@@ -5,7 +5,6 @@
 		<content>
 		SELECT count(id)
 		FROM company
-		WHERE id = :id
 		</content>
 	</statement>
 
